@@ -268,8 +268,7 @@ jobs:
       - checkout
       - install_awscli
       - restore_cache:
-          keys:
-            - [build-frontend]
+          keys: [frontend-deploy]
       - run:
           name: Install dependencies
           command: |
@@ -312,7 +311,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys: [backend-deps]
+          keys: [backend-deploy]
       - run:
           name: Install dependencies
           command: |
