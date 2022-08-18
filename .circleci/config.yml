@@ -151,10 +151,7 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - run: 
-          name: Install tar utility
-          command: |
-            yum install -y tar gzip
+      - run: yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -194,17 +191,6 @@ jobs:
     docker:
       # Docker image here that supports Ansible
       - image: python:3.7-alpine3.11
-        environment:
-          NODE_ENV: "production"
-          VERSION: "1"
-          ENVIRONMENT: "production"
-          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-          TYPEORM_HOST: $TYPEORM_HOST
-          TYPEORM_USERNAME: $TYPEORM_USERNAME
-          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-          TYPEORM_DATABASE: $TYPEORM_DATABASE
-          TYPEORM_PORT: $TYPEORM_PORT
-          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
     steps:
       # Checkout code from git
       - checkout
@@ -240,15 +226,14 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
-      - image: sleavely/node-aswcli:13.x
+      - image: cimg/node:13.8.0
     steps:
       - checkout
-      # - install_awscli
+      - install_awscli
       - run:
           name: Run migrations
           command: |
             cd backend
-            cat .env
             # npm cache clean --force
             # rm -rf node_modules && rm package-lock.json
             npm install
