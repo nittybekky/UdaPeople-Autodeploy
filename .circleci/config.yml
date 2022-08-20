@@ -349,32 +349,34 @@ jobs:
             apk add --update ansible nodejs npm tar gzip
             apk add curl
             pip3 install awscli
-      - run:
-          name: Package Backend
-          command: |
-            cd backend
-            npm install
-            npm run build
-            tar -czvf artifact.tar.gz dist/* package*
-            ls 
-            cd ..
-            cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files
-            echo "List main folder"
-            ls 
-            echo "Find the tar"
-            ls ~/project/.circleci/ansible/roles/deploy/files/
-            echo "inside ansible"
-            ls ~/project/.circleci/ansible/
+      # - run:
+      #     name: Package Backend
+      #     command: |
+      #       cd backend
+      #       npm install
+      #       npm run build
+      #       tar -czvf artifact.tar.gz dist/* package*
+      #       ls 
+      #       cd ..
+      #       cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files
+      #       echo "List main folder"
+      #       ls 
+      #       # echo "Find the tar"
+      #       # ls ~/project/.circleci/ansible/roles/deploy/files/
+      #       # echo "inside ansible"
+      #       # ls ~/project/.circleci/ansible/
       - run:
           name: Deploy backend
           command: |
-            # cd backend
-            # npm install
-            # npm run build
-            # cd ..
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
-            # tar -C backend -czvf artifact.tar.gz .
-            cat ~/project/.circleci/ansible/inventory.txt
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
 
       - destroy-environment:
