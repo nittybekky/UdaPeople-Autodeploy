@@ -5,14 +5,18 @@
     state: directory
 
 - name: "Unarchive backend files"
-  unarchive:
-    src: artifact.tar.gz
-    dest: ~/backend-app
+  # unarchive:
+  #   src: artifact.tar.gz
+  #   dest: ~/backend-app
+  shell : |
+    cd ~/backend-app
+    tar xvzf artifact.tar.gz -C .
 
 - name: "Installing Node Dependencies"
   shell: |
     cd ~/backend-app
-    npm i
+    ls
+    npm install
 - name: "Executing Node app with PM2"
   shell: |
     cd ~/backend-app/dist
