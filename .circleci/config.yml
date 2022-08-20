@@ -349,29 +349,31 @@ jobs:
             apk add --update ansible nodejs npm tar gzip
             apk add curl
             pip3 install awscli
-      # - run:
-      #     name: Package Backend
-      #     command: |
-      #       cd backend
-      #       npm install
-      #       npm run build
-      #       tar -czvf artifact.tar.gz dist/* package*
-      #       ls 
-      #       cd ..
-      #       cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-      #       echo "List main folder"
-      #       ls 
-      #       echo "Find the tar"
-      #       ls ~/project/.circleci/ansible/roles/deploy/files/
       - run:
-          name: Deploy backend
+          name: Package Backend
           command: |
             cd backend
             npm install
             npm run build
+            tar -czvf artifact.tar.gz dist/* package*
+            ls 
             cd ..
+            cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+            echo "List main folder"
+            ls 
+            echo "Find the tar"
+            ls ~/project/.circleci/ansible/roles/deploy/files/
+            echo "inside ansible"
+            ls ~/project/.circleci/ansible/
+      - run:
+          name: Deploy backend
+          command: |
+            # cd backend
+            # npm install
+            # npm run build
+            # cd ..
             cd .circleci/ansible
-            tar -C backend -czvf artifact.tar.gz .
+            # tar -C backend -czvf artifact.tar.gz .
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
 
