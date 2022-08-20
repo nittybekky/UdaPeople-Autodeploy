@@ -365,6 +365,17 @@ jobs:
       #       # ls ~/project/.circleci/ansible/roles/deploy/files/
       #       # echo "inside ansible"
       #       # ls ~/project/.circleci/ansible/
+
+       - run:
+          name: Package Backend
+          command: |
+            cd backend
+            npm run build
+            tar -czvf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz ~/project.circleci/ansible/roles/deploy/files
+            cd .circleci/ansible/roles/deploy/files
+            ls
       - run:
           name: Deploy backend
           command: |
