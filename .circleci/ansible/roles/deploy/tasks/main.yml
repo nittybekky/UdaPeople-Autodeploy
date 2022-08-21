@@ -35,7 +35,7 @@
     path: ~/backend-app
     state: directory
 
-- name: Copy index test page
+# - name: Copy index test page
   # template:
   #   src: "files/artifact.tar.gz"
   #   dest: "~/backend-app"
