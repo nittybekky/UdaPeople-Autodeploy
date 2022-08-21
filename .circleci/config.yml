@@ -16,7 +16,8 @@ commands:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name "udapeople-backend-<< parameters.Workflow_ID >>"
-            aws s3 rm "s3://udapeople-<< parameters.Workflow_ID >>" --recursive 
+            # aws s3 rm "s3://udapeople-<< parameters.Workflow_ID >>" --recursive 
+            aws s3 ls
             aws cloudformation delete-stack --stack-name "udapeople-frontend-<< parameters.Workflow_ID >>"
   #           exit 1udapeople-frontend-e8916be
 
