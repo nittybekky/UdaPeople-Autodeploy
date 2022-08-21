@@ -16,8 +16,8 @@ commands:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.Workflow_ID>>
+            aws s3 rm "s3://udapeople-<<parameters.Workflow_ID>>" --recursive 
             aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.Workflow_ID>>
-            # aws s3 rm "s3://udapeople-<<parameters.Workflow_ID>>" --recursive 
   #           exit 1
 
   install_awscli:
@@ -41,7 +41,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_<< parameters.Workflow_ID >>)
             # Logic for reverting the database state
             if (( $SUCCESS == 1 ));
             then
@@ -428,8 +428,35 @@ jobs:
             else
                 return 1
             fi
-             curl "${API_URL}/api/status"
 
+  smoke-test-frontend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl
+            pip install awscli
+      - run:
+          name: Backend smoke test
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com"             
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              return 1
+            else
+              return 1
+            fi      
+      - destroy-environment:
+        Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
+      - revert-migrations   
+
+    
 
 #   cloudfront-update:
 #     docker:
