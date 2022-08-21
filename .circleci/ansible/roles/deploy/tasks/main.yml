@@ -36,17 +36,18 @@
     state: directory
 
 - name: Copy index test page
-  template:
-    src: "files/artifact.tar.gz"
-    dest: "~/backend-app"
+  # template:
+  #   src: "files/artifact.tar.gz"
+  #   dest: "~/backend-app"
 
 - name: "Unarchive backend files"
-  # unarchive:
-  #   src: artifact.tar.gz
-  #   dest: ~/backend-app
-  shell : |
-    cd ~/backend-app
-    tar xvzf artifact.tar.gz -C .
+  unarchive:
+    src: artifact.tar.gz
+    dest: ~/backend-app
+  # shell : |
+  #   cp 
+  #   cd ~/backend-app
+  #   tar xvzf artifact.tar.gz -C .
 
 - name: "Installing Node Dependencies"
   shell: |
