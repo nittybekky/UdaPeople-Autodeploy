@@ -473,11 +473,37 @@ jobs:
 
     
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
+  # cloudfront-update:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: get old workflow for clean
+  #         command: |
+  #           OldWorkflowID=$(aws cloudformation \
+  #           list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+  #           --no-paginate --output text)
+  #           echo $OldWorkflowID >> ~/OldWorkflowID.txt
+  #           cat ~/OldWorkflowID.txt
+  #           # curl https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_${CIRCLE_WORKFLOW_ID:0:7} \
+  #           # -H "X-Api-Key: ${THISDB_API_KEY}" \
+  #           # -d "$OldWorkflowID"  
+  #     - run:
+  #         name: Updating cloudfront distribution
+  #         command: |
+  #           aws cloudformation deploy \
+  #           --template-file .circleci/files/cloudfront.yml \
+  #           --stack-name InitialStack \
+  #           --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+  #           --tags project=udapeople-newcloudfront
+
+      # Here's where you will add some code to rollback on failure  
+
 #       - run:
 #           name: Install dependencies
 #           command: |
