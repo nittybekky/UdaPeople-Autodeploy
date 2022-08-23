@@ -16,10 +16,10 @@ commands:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name "udapeople-backend-<< parameters.Workflow_ID >>"
-            # aws s3 rm "s3://udapeople-<< parameters.Workflow_ID >>" --recursive 
             aws s3 ls
+            aws s3 rm "s3://udapeople-<< parameters.Workflow_ID >>" --recursive 
             aws cloudformation delete-stack --stack-name "udapeople-frontend-<< parameters.Workflow_ID >>"
-  #           exit 1udapeople-frontend-e8916be
+  #           exit 1
 
   install_awscli:
     description: Install AWS CLI v2
@@ -36,7 +36,7 @@ commands:
     parameters:
       Workflow_ID:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
+        
     steps:
       - run:
           name: Revert migrations
@@ -160,7 +160,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags projectsection=udapeople-backend  
+              --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 #               exit 1
       - run:
           name: Ensure front-end infrastructure exist
@@ -169,15 +169,19 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags projectsection=udapeople-frontend  
+              --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} 
 #               exit 1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             aws ec2 describe-instances \
-              --filter "Name=tag:projectsection,Values=udapeople-backend" \
+              --filter "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text >> .circleci/ansible/inventory.txt
+            # aws cloudformation describe-stacks \
+            # --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            # --query "Stacks[0].Outputs[0].OutputValue" \
+            # --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
             # exit 1
       - persist_to_workspace:
@@ -274,7 +278,7 @@ jobs:
       - destroy-environment:
            Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
-      - revert-migrations
+      # - revert-migrations
 
 
   deploy-frontend:
@@ -286,7 +290,19 @@ jobs:
       - checkout
       - install_awscli
       - restore_cache:
-          keys: [frontend-deploy]
+          keys: [frontend-build]
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            export API_URL="http://${BACKEND_PUBLIC_IP}:3030"
+            echo "${API_URL}"
+            echo API_URL="http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
+            cat frontend/.env
       - run:
           name: Install dependencies
           command: |
@@ -295,28 +311,17 @@ jobs:
             npm install
             npm run build
       - run:
-          name: Get backend url
-          command: |
-            # your code here
-            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:projectsection,Values=udapeople-backend" \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
-            export API_URL="http://${BACKEND_PUBLIC_IP}:3030"
-            echo "${API_URL}"
-            echo API_URL="http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
-            cat frontend/.env
-      - run:
           name: Deploy frontend objects
           command: |
             # your code here
             cd frontend
+            npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment:
            Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
-      - revert-migrations
+      # - revert-migrations
       # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -396,8 +401,10 @@ jobs:
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt deploy-backend.yml
 
       - destroy-environment:
-          Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
-      - revert-migrations
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'  
+
+      - revert-migrations:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'
         
 
   smoke-test-backend:
@@ -417,7 +424,7 @@ jobs:
           command: |
             # Fetch and prepare the BACKEND_IP env var
             BACKEND_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:projectsection,Values=udapeople-backend" \
+            --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --output text)
             API_URL="http://${BACKEND_IP}:3030"
@@ -429,6 +436,11 @@ jobs:
             else
                 return 1
             fi
+      - destroy-environment:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'  
+
+      - revert-migrations:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'
 
   smoke-test-frontend:
     docker:
@@ -454,8 +466,10 @@ jobs:
               return 1
             fi      
       - destroy-environment:
-          Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
-      - revert-migrations   
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'  
+
+      - revert-migrations:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'
 
     
 
