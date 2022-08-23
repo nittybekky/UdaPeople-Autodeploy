@@ -481,8 +481,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt update
-            sudo apt install -y tar gzip curl software-properties-common
+            yum -y tar gzip curl software-properties-common
       - run:
           name: get old workflow for clean
           command: |
