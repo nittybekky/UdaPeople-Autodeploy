@@ -42,7 +42,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl -k  https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_<< parameters.Workflow_ID >>)
             # Logic for reverting the database state
             if (( $SUCCESS == 1 ));
             then
@@ -269,9 +269,9 @@ jobs:
             then
               curl -k https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_${CIRCLE_WORKFLOW_ID:0:7} \
                 -d "1"
-            else
-              curl -k https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_${CIRCLE_WORKFLOW_ID:0:7} \
-                -d "0"
+            # else
+            #   curl -k https://kvdb.io/8CULQZL66SNsYjsphaujfc/migration_${CIRCLE_WORKFLOW_ID:0:7} \
+            #     -d "0"
             fi
             # exit 1
      # Here's where you will add some code to rollback on failure  
@@ -455,7 +455,7 @@ jobs:
             apk add --update curl
             pip install awscli
       - run:
-          name: Backend smoke test
+          name: Frontend smoke test
           command: |
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"             
             echo ${URL} 
