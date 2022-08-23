@@ -481,7 +481,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum -y tar gzip curl software-properties-common
+            yum -y tar gzip 
       - run:
           name: get old workflow for clean
           command: |
@@ -503,6 +503,11 @@ jobs:
             --tags project=udapeople-newcloudfront
             echo OldWorkflowID: "$OldWorkflowID"
             echo NewWorkflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'  
+
+      - revert-migrations:
+          Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'
 
       # Here's where you will add some code to rollback on failure  
 
