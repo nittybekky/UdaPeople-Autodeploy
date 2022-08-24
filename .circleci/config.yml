@@ -532,11 +532,17 @@ jobs:
       - run:
           name: Get Old Workflow ID and Remove old stacks and files
           command: |
-            OldS3WorkflowID=$(cat ~/OldS3WorkflowID.txt)
-            OldWorkflowID=$(cat ~/OldWorkflowID.txt) #This value should be same as the current workflowID, just referencing for clarity
+            OldS3WorkflowID=$(aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+            echo $OldS3WorkflowID >> ~/OldS3WorkflowID.txt
+            cat ~/OldS3WorkflowID.txt
+
+          
+
             CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
             echo $OldS3WorkflowID
-            echo $OldWorkflowID
+            echo $OldS3WorkflowIDcheck
             if [[ "$CurrentWorkflowID" != "$OldS3WorkflowID" ]]
             then
               echo '--------------------------------------Delete in Progress----------------------------------------'
