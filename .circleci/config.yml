@@ -517,7 +517,8 @@ jobs:
       # Here's where you will add some code to rollback on failure  
 
 
-  docker:
+  cleanup:
+    docker:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
@@ -540,8 +541,8 @@ jobs:
             then
               echo '--------------------------------------Delete in Progress----------------------------------------'
               aws s3 rm "s3://$OldS3WorkflowID" --recursive
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-$OldWorkflowID"
-              aws cloudformation delete-stack --stack-name "udapeople-backend-$OldWorkflowID"
+              # aws cloudformation delete-stack --stack-name "udapeople-frontend-$OldWorkflowID"
+              # aws cloudformation delete-stack --stack-name "udapeople-backend-$OldWorkflowID"
             else
               echo '--------------------------------------Nothing To Delete----------------------------------------'
             fi
@@ -550,12 +551,13 @@ jobs:
 
       - revert-migrations:
           Workflow_ID: '${CIRCLE_WORKFLOW_ID:0:7}'
-            
+              
 
 workflows:
   default:
     jobs:
       - build-frontend
+
       - build-backend
       - test-frontend:
           requires: [build-frontend]
