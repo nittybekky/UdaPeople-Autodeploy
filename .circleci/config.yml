@@ -318,7 +318,7 @@ jobs:
             npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 cp dist s3://udapeople-goodyblue --recursive
       - destroy-environment:
            Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
       # - revert-migrations
@@ -538,7 +538,6 @@ jobs:
             cat ~/OldS3WorkflowID.txt
             OldS3WorkflowID2=$(curl -k https://kvdb.io/8CULQZL66SNsYjsphaujfc/OldS3WorkflowID)
             echo $OldS3WorkflowID2
-
           
 
             CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
