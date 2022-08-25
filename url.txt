@@ -1,0 +1,5 @@
+URL1: https://github.com/nittybekky/UdaPeople-Autodeploy
+
+URL02: http://udapeople-e6224a2.s3-website-us-east-1.amazonaws.com/#/employees
+
+URL03: d13du0unkdsqhn.cloudfront.net
