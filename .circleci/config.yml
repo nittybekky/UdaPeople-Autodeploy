@@ -323,7 +323,7 @@ jobs:
       - destroy-environment:
            Workflow_ID: '${CIRCLECI_WORKFLOW_ID:0:7}'
       # - revert-migrations
-      # Here's where you will add some code to rollback on failure      
+      # Here's where you will add some code to rollback on failure       
                     
   deploy-backend:
     docker:
